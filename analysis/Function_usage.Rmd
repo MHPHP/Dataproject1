@@ -1,0 +1,398 @@
+---
+title: "Presentation of functions"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: true
+    css: style.css
+bibliography: references.bib
+csl: brewingscience.csl
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+source("code/function.R")
+library(tidyverse)
+library(ggplot2)
+library(kableExtra)
+```
+
+
+
+This page is intended to provide an overview of the functions that are used on the [Examples](example.html) page. The structure of the page is that each function is presented with a short description of the input arguments and the output. To each function there will be a link to a page that include a further detailed description of the function and where the code is also presented.
+
+The reader can download all the functions following the link below. The link will take the reader to a new page. This page can be saved as a R file.
+
+```{r, echo = FALSE, message= FALSE, warning= FALSE}
+library(downloadthis)
+
+download_link(
+  link = "https://raw.githubusercontent.com/nbendsen/DataProject/master/code/function.R",
+  button_label = "Download HERE",
+  button_type = "succes",
+  has_icon = FALSE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+```
+
+```{r, include=FALSE}
+Cover <- data.frame(   a1 = c(2,0,5,0,1,0,16),
+                       a2 = c(0,0,0,2,0,1,10),
+                       a3 = c(0,0,1,1,16,0,2),
+                       a4 = c(1,0,10,9,0,0,7),
+                       a5 = c(0,0,0,3,0,0,0),
+                       a6 = c(3,0,11,0,14,1,13),
+                       a7 = c(0,0,7,4,0,1,0),
+                       a8 = c(0,0,16,9,0,0,9),
+                       a9 = c(2,0,0,1,11,0,5))
+
+
+rownames(Cover) <- c("Plot 1", "Plot 2", "Plot 3", "Plot 4", "Plot 5", "Plot 6", "Plot 7")
+colnames(Cover) <- c("Species 1", "Species 2", "Species 3", "Species 4", "Species 5", "Species 6", "Species 7", "Species 8", "Species 9")
+
+```
+
+<br>
+
+The presentation of each function will also contain a small example of how the function is applied. To to this, we again use a small constructed cover dataset and presence/absence dataset. We remind the reader that cover data describes how much of the surface area that would be covered by a specific species if it is projected down on the ground. In this example cover data will take the form of an integer value between 0 and 16, where 16 is full cover and 0 is no cover.
+
+
+When referring to cover_data, the dataset looks like:
+
+```{r, echo = FALSE}
+kable(Cover, "html") %>% kable_styling()
+```
+
+
+When referring to presence_absence_data, the dataset looks like:
+
+```{r, include=FALSE}
+PresenceAbsence <- data.frame(   a1 = c(1,0,1,0,1,0,1),
+                                 a2 = c(1,1,0,1,0,1,1),
+                                 a3 = c(0,0,1,1,1,0,1),
+                                 a4 = c(1,0,1,1,0,0,1),
+                                 a5 = c(0,0,0,1,0,0,1),
+                                 a6 = c(1,0,1,0,1,1,1),
+                                 a7 = c(1,0,1,1,0,1,0),
+                                 a8 = c(0,0,1,1,0,0,1),
+                                 a9 = c(1,0,0,1,1,0,1))
+
+
+rownames(PresenceAbsence) <- c("Plot 1", "Plot 2", "Plot 3", "Plot 4", "Plot 5", "Plot 6", "Plot 7")
+colnames(PresenceAbsence) <- c("Species 1", "Species 2", "Species 3", "Species 4", "Species 5", "Species 6", "Species 7", "Species 8", "Species 9")
+
+```
+
+
+```{r, message=FALSE, echo = FALSE}
+kable(PresenceAbsence, "html") %>% kable_styling()
+```
+
+For each function we will use the above data to give an example of the usage of the function.
+
+<h2>Beta Binomial Cover Update</h2>
+
+
+Main function of this vignette. The function is an implementation of the method outlined on the home page.
+
+**Usage:**
+
+beta_binomial_cover_update(cover_data, presence_absence_data, n = 16 , remove_column = 0)
+
+**Arguments:**
+
+* **Cover_data**: Data frame with plots as rows and species as columns. Each cell in the data frame contains cover data for a given specie in a given plot.
+* **presence_absence_data**: Data frame with plots as rows and species as columns. Each cell in the data frame contains a 1 if the specie is present in the plot or a 0 if the specie is absent in the plot.
+* **n**: An integer. A number each cell in the cover data gets divided by if the cover data is not in the interval $[0,1]$. In the NOVANA dataset n = 16 secures this property. If the cover data is already on the interval $[0,1]$, one can just let n = 1. n is the number of pins used in each blot, so by dividing each entry with n, we normalize the data.
+* **remove_column**: An integer. In case the first columns in the cover_data and presence_absence_data contain data not about the species but rather information on the plots, these columns have to be removed. The numbers of columns to be removed must be the same in the cover_data and presence/absence_data. The removed columns will be included again in the  output. In the NOVANA dataset the first columns are "site", "plot", year" so remove_column = 3 when this datasat is applied.
+
+**Output** 
+
+* The function returns a dataframe with plots as rows and species as columns, and where each entry contain new abundance data for a specie in a plot.
+
+For further specifications of the function click [link](bayesian_method_describtion.html)
+
+**Calculated example** 
+
+```{r, message=FALSE}
+res1 <- beta_binomial_cover_update(Cover, PresenceAbsence, n = 16 , remove_column = 0)
+```
+
+The data from the outcome of the function looks like:
+
+```{r, echo = FALSE}
+kable(res1, "html") %>% kable_styling(font_size = 12)
+```
+
+A more detailed description of the implementation of the model can be found at: [detailed description](bayesian_method_describtion.html). This page also includes the full code of the function.
+
+
+<h2> Functions for diversity estimates</h2>
+
+
+The functions below implement the different diversity estimates defined at the [Diversity](Diversity.html) page. The code implementations of the functions can be found at [implementation](diversity_functions_code.html)
+
+<h3> Shannon index </h3>
+
+**Usage:**
+
+shannon(cover_data, remove_column = NULL)
+
+**Arguments:**
+
+* **Cover_data**: Data frame with plots as rows and species as columns. Each cell in the data frame contains cover data for a given specie in a given plot.
+
+* **remove_column**: An integer. In case the first columns in the cover_data contain data not about the species but rather information on the plots, these columns have to be removed. If remove_column is left empty it is assumed that all columns contain cover_data on species.
+
+**Output:**
+
+* A vector with the shannon index for each plot in the input cover_data. First value in the vector corresponds to the first plot in the cover_data and so on.
+
+**Calculated example** 
+
+```{r, message=FALSE}
+res2 <- shannon(Cover, remove_column = 0)
+```
+
+
+```{r, message=FALSE, echo = FALSE}
+v <- as.data.frame(res2)
+colnames(v) <- "Shannon index"
+kable(v, "html") %>% kable_styling(full_width = FALSE, position = "left")
+```
+
+
+<h3> Simpson's index</h3>
+
+
+**Usage:**
+
+simpson(cover_data, remove_column = NULL)
+
+**Arguments:**
+
+* **Cover_data**: Data frame with plots as rows and species as columns. Each cell in the data frame contains cover data for a given specie in a given plot.
+
+* **remove_column**: An integer. In case the first columns in the cover_data contain data not about the species but rather information on the plots, these columns have to be removed. If remove_column is left empty it is assumed that all columns contain cover_data on species.
+
+**Output:**
+
+* A vector with simpson's index for each plot in the input cover_data. First value in the vector corresponds to the first plot in the cover_dataand so on.
+
+**Calculated example** 
+
+```{r, message=FALSE}
+res3 <- simpson(Cover, remove_column = 0)
+```
+
+
+```{r, message=FALSE, echo = FALSE}
+v <- as.data.frame(res3)
+colnames(v) <- "Simpson's index"
+kable(v, "html") %>% kable_styling(full_width = FALSE, position = "left")
+```
+
+<h3>Species richness </h3>
+
+
+**Usage:**
+
+species_richness(presence_absence_data, remove_column = NULL)
+
+**Arguments:**
+
+* **presence_absence_data**: Data frame with plots as rows and species as columns. Each cell in the data frame contains a 1 if the specie is present in the plot or a 0 if the specie is absent in the plot.
+
+* **remove_column**: An integer. In case the first columns in the presence_absence_data contain data not about the species but rather information on the plots, these columns have to be removed. If remove_column is left empty it is assumed that all columns contain cover_data on species.
+
+**Output:**
+
+* A vector with species richness for each plot in the input presence_absence_data. First value in the vector corresponds to the first plot in the cover_data and so on.
+
+**Calculated example** 
+
+```{r, message=FALSE}
+res4 <- species_richness(PresenceAbsence, remove_column = 0)
+```
+
+
+```{r, message=FALSE, echo = FALSE}
+v <- as.data.frame(res4)
+colnames(v) <- "Species richness"
+kable(v, "html") %>% kable_styling(full_width = FALSE, position = "left")
+```
+
+
+<h3> Hill shannon diveristy </h3>
+
+**Usage:**
+
+hill_shannon(cover_data, remove_column = NULL)
+
+**Arguments:**
+
+* **Cover_data**: Data frame with plots as rows and species as columns. Each cell in the data frame contains cover data for a given specie in a given plot.
+
+* **remove_column**: An integer. In case the first columns in the cover_data contain data not about the species but rather information on the plots, these columns have to be removed. If remove_column is left empty it is assumed that all columns contain cover_data on species.
+
+**Output:**
+
+* A vector with the Hill Shannon diversity for each plot in the input cover_data. First value in the vector corresponds to the first plot in the cover_data and so on.
+
+**Calculated example** 
+
+```{r, message=FALSE}
+res5 <- hill_shannon(Cover, remove_column = 0)
+```
+
+
+```{r, message=FALSE, echo = FALSE}
+v <- as.data.frame(res5)
+colnames(v) <- "Hill Shannon diversity"
+kable(v, "html") %>% kable_styling(full_width = FALSE, position = "left")
+
+```
+
+<h3> Hill Simpson diversity</h3>
+
+**Usage:**
+
+hill_simpson(cover_data, remove_column = NULL)
+
+**Arguments:**
+
+* **Cover_data**: Data frame with plots as rows and species as columns. Each cell in the data frame contains cover data for a given specie in a given plot.
+
+* **remove_column**: An integer. In case the first columns in the cover_data contain data not about the species but rather information on the plots, these columns have to be removed. If remove_column is left empty it is assumed that all columns contain cover_data on species.
+
+**Output:**
+
+* A vector with the Hill Simpson diversity for each plot in the input cover_data. First value in the vector corresponds to the first plot in the cover_data and so on.
+
+**Calculated example** 
+
+```{r, message=FALSE}
+res6 <- hill_simpson(Cover, remove_column = 0)
+```
+
+
+```{r, message=FALSE, echo = FALSE}
+v <- as.data.frame(res6)
+colnames(v) <- "Hill Simpson diversity"
+kable(v, "html") %>% kable_styling(full_width = FALSE, position = "left")
+
+```
+
+
+
+<h2>Plot of different diversities</h2>
+
+
+This function plots different diversity estimates of a plot against some information of interest about the plot. 
+
+**Usage:**
+
+plot_diversity(data, diversities, plot_info, description = NULL)
+
+**Arguments:**
+
+* **data**: A data frame. Contains one or more columns of different diversity estimates of plots and also a column with some information about the plots, could be a plot ID or something like it.
+* **diversities**: A list of strings. The names of the columns in the data that contain diversity estimates.
+* **plot_info**: A string. The column name in the data that contains the plot information one wants to plot the diversities against.
+* **description**: A string. The description of the plot information.
+
+**Output:**
+
+* Plots with different diversity estimates mapped against the plot information of interest.
+
+Further documentation and code implementation at [link](gradient_plot.html)
+
+**Calculated example** 
+
+We will here use the data:
+
+```{r, echo= FALSE}
+Cover2 <- Cover
+Cover2$pH <- c(4,3,7,4,5,3.5,8)
+Cover2$Hill_simpson <- hill_simpson(Cover, remove_column = 0)
+Cover2$Species_richness <- species_richness(Cover)
+Cover2$Hill_shannon <- hill_shannon(Cover)
+```
+
+```{r, echo = FALSE}
+kable(Cover2[10:13], "html") %>% kable_styling()
+```
+
+```{r, warning= FALSE, message= FALSE}
+plot_diversity(Cover2, c("Hill_simpson", "Species_richness", "Hill_shannon"), "pH", "The pH value of the soil for each plot")
+```
+
+
+```{r, include=FALSE, eval=FALSE}
+<h1>diversity_index</h1>
+------
+
+A function using abundance data to calculate a diversity index using:
+
+$$
+\text{Hill diversity = }\left( \sum_{i=1}^{S} p_i (r_i)^{l}\right)^{1/l}
+$$
+
+**Usage:**
+
+diversity_index(abundance_data, remove_columns = 0, l = 1)
+
+**Arguments:**
+
+* **abundance_data**: Abundance data in a data frame, with plots as rows and species as columns.
+* **remove_columns**: Exclude n column from the data analysis. i.e if the first 3 columns include data about the plot, and is not data about a species can they be excluded.
+* **l**: A number that specifies l in the formula.
+
+**Output**
+
+A vector with the diversity for each row in the abundance data.
+
+```
+
+
+<h2> Diversity profile comparison</h2>
+
+
+This function takes in two data frames with cover data, one with the observed cover data, and one with the beta binomial updated cover data. Its output is a plot that shows different hill diversities as a function of the exponent $l$ in:
+
+$$
+\text{Hill diversity = }\left( \sum_{i=1}^{S} p_i (r_i)^{l}\right)^{1/l}
+$$
+
+**Usage:**
+
+Diversity_profile_comparison(data_observed, data_new, plot, remove_column = NULL)
+
+**Arguments:**
+
+* **data_observed**: Data frame with plots as rows and species as columns. Each cell in the data frame contains cover data for a given specie in a given plot.
+
+* **data_new**: Data frame with plots as rows and species as columns. Each cell in the data frame contains the beta binomial updated data for a given specie in a given plot.
+
+* **plot**: An integer. Which plot should be used in the comparison, ie which row should the data be taken from.
+
+* **remove_column**:  An integer. In case the first columns in the data_observed and data_new contain data not about the species but rather information on the plots, these columns have to be removed. If remove_column is left empty it is assumed that all columns contain data on species.
+
+**Output:**
+
+* A plot with the hill diversity (y-axis) as a function of the exponent $l$ (x-axis). the two lines are from the observed cover data and the beta binomial updated cover data.  
+
+**Calculated example** 
+
+In the example will we use the function beta_binomial_cover_update to get the updated cover data.
+
+```{r}
+beta_binomial_cover_updated_data <- beta_binomial_cover_update(Cover, PresenceAbsence, n = 16 , remove_column = 0)
+```
+
+```{r}
+different_diversities(Cover, beta_binomial_cover_updated_data, plot = 1,  remove_column = 3)
+```
+

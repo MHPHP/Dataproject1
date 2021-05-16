@@ -1,0 +1,54 @@
+---
+title: "A Bayesian method for better plant diversity estimates"
+site: workflowr::wflow_site
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+
+Species diversity is an important measure, that can be used to discribe the state of a nature area, and the change in the species diversity is used to inform about whether the state of an area is in progress or decline. Many methods for estimating the abundance of species within an area have been proposed in the literature. In this vignette we will propose a new method with this goal where we combine cover data and presence/absence data, to combine the information from both datasets. We will be working with a subset of the NOVANA dataset as examples to show how this new method can be applied.
+
+The idear of combining information from both datatypes, is that they do not contain the same sort of information, hence some information will be lost if one were to only use on of them. 
+
+
+Here you can gain an overview of the pages included in the vignette:
+
+* **[Introduction](introduction.html)**
+  * The introduction page will give you a brief introduction of the data used and the method developed. 
+* **[Diversity](Diversity.html)**
+  * The Diversity page will give you an overview of the different diversity estimates, we have used as examples. 
+* **[Bayesian model](Model.html)**
+  * The Bayesian model page contains a dicribtion of the theory used to develop the model, and why we have choosen the distributions we have. 
+* **[Examples](example.html)**
+  * Examples of use cases for the Bayesian model
+* **[Model validation](model_validering.html)**
+  * The Model Validation page shows how the developed method is perfoming compared to only using cover data or present/absence data for calculating diversity estimates.  
+* **[Functions](function_usage.html)**
+  * The Functions page gives an overview of the functions used, what they take as input, what they give as result and how they perfom on an example dataset. 
+
+
+<h2>Download</h2>
+To download the main function of this vignette click on button below. This will open a new page that can be saved as a R file.
+
+```{r, echo = FALSE, message= FALSE, warning= FALSE}
+library(downloadthis)
+
+download_link(
+  link = "https://raw.githubusercontent.com/nbendsen/DataProject/master/code/Beta_binomial_cover_update_function.R",
+  button_label = "Download HERE",
+  button_type = "succes",
+  has_icon = FALSE,
+  icon = "fa fa-save",
+  self_contained = FALSE
+)
+
+```
+<br><br>
+<br><br>
+<br><br>
+
+
+
